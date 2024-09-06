@@ -1,0 +1,187 @@
+openapi: "3.0.3"
+info:
+  title: Todo List API
+  version: "1.0"
+  description: "API Spec for Simple Todo List "
+servers:
+  - url: http://localhost:8080/api/v1
+paths:
+  /todos:
+    get:
+      security:
+        - TodoAuth:
+          - X-API-Key   
+      tags:
+        - Todo List API
+      description: List of Todos
+      summary: List of Todos
+      responses:
+        200:
+          description: Success get all Todos
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: number
+                  status:
+                    type: string
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/todos"                
+    
+    post:
+      security:
+        - TodoAuth:
+          - X-API-Key  
+      tags:
+        - Todo List API
+      description: Create Todo
+      summary: Create Todo
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+      responses:
+        200:
+          description: Success create Todo
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: number
+                  status:
+                    type: string
+                  data:
+                   $ref: "#/components/schemas/todos"
+  
+
+  /todos/{todoId}:
+    get:
+      security:
+        - TodoAuth:
+          - X-API-Key
+      tags:
+        - Todo List API
+      description: Get Todo by ID
+      summary: Get Todo by ID
+      parameters:
+        - name: todoId
+          in: path
+          schema: 
+            type: string
+          required: true
+          description: Todo ID
+      responses:
+        200:
+          description: Seccess get Todo
+          content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    code:
+                      type: number
+                    status:
+                      type: string
+                    data: 
+                      $ref: "#/components/schemas/todos"
+
+    put:  
+      security:
+        - TodoAuth:
+          - X-API-Key
+      description : Update Todo
+      summary: Update Todo
+      tags:
+        - Todo List API
+      parameters:
+        - name: todoId
+          in: path
+          description: Todo ID
+          schema: 
+            type: string
+          required: true
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+      responses:
+        200:
+          description: Success update Todo
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: number
+                  status:
+                    type: string
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/todos"              
+    delete:
+      security:
+        - TodoAuth:
+          - X-API-Key
+      tags:
+        - Todo List API
+      description: Delete Todo by ID
+      summary: Delete Todo by ID
+      parameters:
+        - name: todoId
+          in: path
+          schema: 
+            type: string
+          required: true
+          description: Todo ID
+      responses:
+        200:
+          description: Seccess delete Todo
+          content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    code:
+                      type: number
+                    status:
+                      type: string
+    
+                   
+components:
+  securitySchemes:
+    TodoAuth:
+      type: apiKey
+      in: header
+      name: X-API-Key
+      description: Authentication for Todo API
+  schemas:
+    todos:
+      type: "object"
+      properties:
+        id:
+          type: number
+        name:
+          type: string
+        timeCreate:
+          type: string
+          format: date-time
+        timeFinsih:
+          type: string
+          format: date-time
+          nullable: true
