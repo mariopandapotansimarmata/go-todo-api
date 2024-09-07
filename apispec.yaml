@@ -140,8 +140,8 @@ paths:
           - X-API-Key
       tags:
         - Todo List API
-      description: Delete Todo by ID
-      summary: Delete Todo by ID
+      description: Delete Todo
+      summary: Delete Todo 
       parameters:
         - name: todoId
           in: path
@@ -162,7 +162,48 @@ paths:
                     status:
                       type: string
     
-                   
+  /todos/{todoId}/finsih:
+    patch:
+      security:
+        - TodoAuth:
+          - X-API-Key
+      tags:
+        - Todo List API
+      description: Set Finish Todo 
+      summary: Set Finish Todo 
+      parameters:
+        - name: todoId
+          in: path
+          schema: 
+            type: string
+          required: true
+          description: Todo ID
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                timeFinish:
+                  type: string
+                  format: date-time
+      responses:
+        200:
+          description: Success set finish Todo
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: number
+                  status:
+                    type: string
+                  data:
+                   $ref: "#/components/schemas/todos"
+
+        
+
 components:
   securitySchemes:
     TodoAuth:
