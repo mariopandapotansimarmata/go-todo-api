@@ -1,8 +1,10 @@
 package web
 
-import "time"
+import (
+	"time"
+)
 
 type TodoSetFinishRequest struct {
-	Id         int
-	TimeFinish time.Time
+	Id         int       `validate:"required"`
+	TimeFinish time.Time `validate:"required"`
 }

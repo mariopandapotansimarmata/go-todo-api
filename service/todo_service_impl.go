@@ -8,14 +8,20 @@ import (
 	"http-basic/model/web"
 	"http-basic/repository"
 	"time"
+
+	"github.com/go-playground/validator/v10"
 )
 
 type TodoServiceImpl struct {
 	TodoRepo repository.TodoImpl
 	DB       *sql.DB
+	Validate *validator.Validate
 }
 
 func (todoService *TodoServiceImpl) Create(ctx context.Context, request web.TodoCreateRequest) web.TodoResponse {
+	err := todoService.Validate.Struct(request)
+	helper.PanicIfErr(err)
+
 	tx, err := todoService.DB.Begin()
 	helper.PanicIfErr(err)
 	defer helper.CommitOrRollBack(tx)
@@ -31,6 +37,9 @@ func (todoService *TodoServiceImpl) Create(ctx context.Context, request web.Todo
 }
 
 func (todoService *TodoServiceImpl) Update(ctx context.Context, request web.TodoUpdateRequest) web.TodoResponse {
+	err := todoService.Validate.Struct(request)
+	helper.PanicIfErr(err)
+
 	tx, err := todoService.DB.Begin()
 	helper.PanicIfErr(err)
 	defer helper.CommitOrRollBack(tx)
@@ -85,6 +94,9 @@ func (todoService *TodoServiceImpl) FindByAll(ctx context.Context) []web.TodoRes
 }
 
 func (todoService *TodoServiceImpl) SetFinish(ctx context.Context, request web.TodoSetFinishRequest, timeFinish time.Time) web.TodoResponse {
+	err := todoService.Validate.Struct(request)
+	helper.PanicIfErr(err)
+
 	tx, err := todoService.DB.Begin()
 	helper.PanicIfErr(err)
 	defer helper.CommitOrRollBack(tx)

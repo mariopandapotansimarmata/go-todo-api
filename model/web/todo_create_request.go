@@ -1,5 +1,5 @@
 package web
 
 type TodoCreateRequest struct {
-	Name string
+	Name string `validate:"required"`
 }
