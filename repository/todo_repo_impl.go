@@ -73,10 +73,8 @@ func (repository *TodoImpl) FindAll(ctx context.Context, tx *sql.Tx) ([]domain.T
 	return listTodos, nil
 }
 
-func (repository *TodoImpl) SetFinish(ctx context.Context, tx *sql.Tx, todo domain.Todo, timeFinish time.Time) domain.Todo {
+func (repository *TodoImpl) SetFinish(ctx context.Context, tx *sql.Tx, todo domain.Todo, timeFinish time.Time) {
 	query := "UPDATE todo SET time_finish = ? WHERE id = ?"
 	_, err := tx.ExecContext(ctx, query, timeFinish, todo.Id)
 	helper.PanicIfErr(err)
-
-	return todo
 }
