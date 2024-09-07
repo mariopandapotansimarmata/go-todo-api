@@ -13,7 +13,7 @@ import (
 )
 
 type TodoServiceImpl struct {
-	TodoRepo repository.TodoImpl
+	TodoRepo repository.TodoRepository
 	DB       *sql.DB
 	Validate *validator.Validate
 }

@@ -13,5 +13,5 @@ type TodoRepository interface {
 	Delete(ctx context.Context, tx *sql.Tx, todo domain.Todo)
 	FindById(ctx context.Context, tx *sql.Tx, todoId int) (domain.Todo, error)
 	FindAll(ctx context.Context, tx *sql.Tx) ([]domain.Todo, error)
-	SetFinish(ctx context.Context, tx *sql.Tx, todoId int, timeFinish time.Time)
+	SetFinish(ctx context.Context, tx *sql.Tx, todoId domain.Todo, timeFinish time.Time)
 }
