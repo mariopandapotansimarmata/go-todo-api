@@ -15,6 +15,10 @@ type TodoControllerImpl struct {
 	TodoService service.TodoService
 }
 
+func NewTodoController(todoService service.TodoService) TodoController {
+	return &TodoControllerImpl{TodoService: todoService}
+}
+
 func (todoController *TodoControllerImpl) Create(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
 	decoder := json.NewDecoder(r.Body)
 	TodoCreateRequest := web.TodoCreateRequest{}
@@ -99,7 +103,7 @@ func (todoController *TodoControllerImpl) FindById(w http.ResponseWriter, r *htt
 }
 
 func (todoController *TodoControllerImpl) FindAll(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
-	todoResponses := todoController.TodoService.FindByAll(r.Context())
+	todoResponses := todoController.TodoService.FindAll(r.Context())
 
 	webRepsonses := web.WebResponse{
 		Code:   http.StatusOK,

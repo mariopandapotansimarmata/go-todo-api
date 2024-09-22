@@ -5,6 +5,6 @@ import (
 )
 
 type TodoSetFinishRequest struct {
-	Id         int       `validate:"required"`
-	TimeFinish time.Time `validate:"required"`
+	Id         int       `validate:"required" json:"id"`
+	TimeFinish time.Time `validate:"required" json:"timeFinish"`
 }

@@ -11,6 +11,6 @@ type TodoService interface {
 	Update(ctx context.Context, request web.TodoUpdateRequest) web.TodoResponse
 	Delete(ctx context.Context, todoId int)
 	FindById(ctx context.Context, todoId int) web.TodoResponse
-	FindByAll(ctx context.Context) []web.TodoResponse
+	FindAll(ctx context.Context) []web.TodoResponse
 	SetFinish(ctx context.Context, request web.TodoSetFinishRequest, timeFinish time.Time) web.TodoResponse
 }
