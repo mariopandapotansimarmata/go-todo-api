@@ -23,8 +23,6 @@ func (repository *TodoImpl) Create(ctx context.Context, tx *sql.Tx, todo domain.
 	err := tx.QueryRowContext(ctx, query, todo.Name, todo.TimeCreate).Scan(&id)
 	helper.PanicIfErr(err)
 
-	helper.PanicIfErr(err)
-
 	todo.Id = int(id)
 
 	return todo
@@ -39,7 +37,7 @@ func (repository *TodoImpl) Update(ctx context.Context, tx *sql.Tx, todo domain.
 }
 
 func (repository *TodoImpl) Delete(ctx context.Context, tx *sql.Tx, todo domain.Todo) {
-	query := "DELETE from todo WHERE id = ?"
+	query := "DELETE from todo WHERE id = $1"
 	_, err := tx.ExecContext(ctx, query, todo.Id)
 	helper.PanicIfErr(err)
 }
@@ -63,6 +61,7 @@ func (repository *TodoImpl) FindAll(ctx context.Context, tx *sql.Tx) ([]domain.T
 	query := "SELECT * from todo"
 	rows, err := tx.QueryContext(ctx, query)
 	helper.PanicIfErr(err)
+	defer rows.Close()
 
 	listTodos := []domain.Todo{}
 
@@ -71,14 +70,13 @@ func (repository *TodoImpl) FindAll(ctx context.Context, tx *sql.Tx) ([]domain.T
 		log.Println("todo")
 		rows.Scan(&todo.Id, &todo.Name, &todo.TimeCreate, &todo.TimeFinish)
 		listTodos = append(listTodos, todo)
-
 	}
 
 	return listTodos, nil
 }
 
 func (repository *TodoImpl) SetFinish(ctx context.Context, tx *sql.Tx, todo domain.Todo, timeFinish time.Time) {
-	query := "UPDATE todo SET time_finish = ? WHERE id = ?"
+	query := "UPDATE todo SET time_finish = $1 WHERE id = $2"
 	_, err := tx.ExecContext(ctx, query, timeFinish, todo.Id)
 	helper.PanicIfErr(err)
 }

@@ -112,13 +112,13 @@ func (todoService *TodoServiceImpl) SetFinish(ctx context.Context, request web.T
 	helper.PanicIfErr(err)
 	defer helper.CommitOrRollBack(tx)
 
-	todoResult, err := todoService.TodoRepo.FindById(ctx, tx, request.Id)
+	todoResult1, err := todoService.TodoRepo.FindById(ctx, tx, request.Id)
 	helper.PanicIfErr(err)
 
-	todoService.TodoRepo.SetFinish(ctx, tx, todoResult, timeFinish)
+	todoService.TodoRepo.SetFinish(ctx, tx, todoResult1, timeFinish)
 
-	todoResult, err = todoService.TodoRepo.FindById(ctx, tx, request.Id)
+	todoResult2, err := todoService.TodoRepo.FindById(ctx, tx, request.Id)
 	helper.PanicIfErr(err)
 
-	return helper.ToTodoResponse(todoResult)
+	return helper.ToTodoResponse(todoResult2)
 }

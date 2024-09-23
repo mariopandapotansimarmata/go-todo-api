@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"http-basic/controller"
 	"http-basic/database"
 	"http-basic/helper"
@@ -16,7 +17,6 @@ import (
 
 func main() {
 	db := database.NewDB()
-
 	validate := validator.New()
 
 	todoRepository := repository.NewTodoRepository()
@@ -30,14 +30,14 @@ func main() {
 	router.GET(path("/todos/:todoId"), controller.FindById)
 	router.PUT(path("/todos/:todoId"), controller.Update)
 	router.DELETE(path("/todos/:todoId"), controller.Delete)
-	router.PATCH(path("/todos/:todoId/"), controller.SetFinish)
+	router.PATCH(path("/todos/:todoId/finish"), controller.SetFinish)
 
 	handler := enableCORS(router)
 	server := http.Server{
 		Addr:    "localhost:8080",
 		Handler: handler,
 	}
-
+	fmt.Println("Web Server ready to server...")
 	err := server.ListenAndServe()
 	helper.PanicIfErr(err)
 }

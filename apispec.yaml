@@ -163,7 +163,7 @@ paths:
                     status:
                       type: string
     
-  /todos/{todoId}/finsih:
+  /todos/{todoId}/finish:
     patch:
       security:
         - TodoAuth:

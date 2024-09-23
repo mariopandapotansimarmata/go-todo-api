@@ -70,11 +70,13 @@ func (todoController *TodoControllerImpl) Delete(w http.ResponseWriter, r *http.
 	id, err := strconv.Atoi(todoId)
 	helper.PanicIfErr(err)
 
+	data := todoController.TodoService.FindById(r.Context(), id)
 	todoController.TodoService.Delete(r.Context(), id)
 
 	webRepsonse := web.WebResponse{
 		Code:   http.StatusOK,
 		Status: http.StatusText(http.StatusOK),
+		Data:   data,
 	}
 
 	w.Header().Add("Content-Type", "application/json")
@@ -118,9 +120,14 @@ func (todoController *TodoControllerImpl) FindAll(w http.ResponseWriter, r *http
 }
 
 func (todoController *TodoControllerImpl) SetFinish(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
+	todoId := params.ByName("todoId")
+	id, err := strconv.Atoi(todoId)
+	helper.PanicIfErr(err)
+
 	todoSetFinishRequest := web.TodoSetFinishRequest{}
 	decoder := json.NewDecoder(r.Body)
 	decoder.Decode(&todoSetFinishRequest)
+	todoSetFinishRequest.Id = id
 
 	todoResponse := todoController.TodoService.SetFinish(r.Context(), todoSetFinishRequest, todoSetFinishRequest.TimeFinish)
 
@@ -132,6 +139,6 @@ func (todoController *TodoControllerImpl) SetFinish(w http.ResponseWriter, r *ht
 
 	w.Header().Add("Content-Type", "application/json")
 	encoder := json.NewEncoder(w)
-	err := encoder.Encode(webRepsonse)
-	helper.PanicIfErr(err)
+	err2 := encoder.Encode(webRepsonse)
+	helper.PanicIfErr(err2)
 }
