@@ -4,7 +4,10 @@ go 1.22.5
 
 require github.com/jackc/pgx/v4 v4.18.3
 
-require github.com/pkg/errors v0.8.1 // indirect
+require (
+	github.com/golang-jwt/jwt/v4 v4.2.0 // indirect
+	github.com/pkg/errors v0.8.1 // indirect
+)
 
 require (
 	github.com/gabriel-vasile/mimetype v1.4.3 // indirect

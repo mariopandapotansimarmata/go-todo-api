@@ -5,7 +5,6 @@ import (
 	"database/sql"
 	"http-basic/helper"
 	"http-basic/model/domain"
-	"log"
 	"time"
 )
 
@@ -67,7 +66,6 @@ func (repository *TodoImpl) FindAll(ctx context.Context, tx *sql.Tx) ([]domain.T
 
 	for rows.Next() {
 		todo := domain.Todo{}
-		log.Println("todo")
 		rows.Scan(&todo.Id, &todo.Name, &todo.TimeCreate, &todo.TimeFinish)
 		listTodos = append(listTodos, todo)
 	}
@@ -79,4 +77,7 @@ func (repository *TodoImpl) SetFinish(ctx context.Context, tx *sql.Tx, todo doma
 	query := "UPDATE todo SET time_finish = $1 WHERE id = $2"
 	_, err := tx.ExecContext(ctx, query, timeFinish, todo.Id)
 	helper.PanicIfErr(err)
+}
+func (repository *TodoImpl) GetUsers(ctx context.Context, tx *sql.Tx, todo domain.Todo, timeFinish time.Time) {
+
 }

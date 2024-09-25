@@ -19,7 +19,7 @@ type TodoServiceImpl struct {
 	Validate *validator.Validate
 }
 
-func NewCategoryService(todoRepo repository.TodoRepository, dB *sql.DB, validate *validator.Validate) TodoService {
+func NewTodoService(todoRepo repository.TodoRepository, dB *sql.DB, validate *validator.Validate) TodoService {
 	return &TodoServiceImpl{
 		TodoRepo: todoRepo,
 		DB:       dB,
@@ -41,7 +41,6 @@ func (todoService *TodoServiceImpl) Create(ctx context.Context, request web.Todo
 	}
 
 	result := todoService.TodoRepo.Create(ctx, tx, todo)
-
 	return helper.ToTodoResponse(result)
 }
 
@@ -51,6 +50,7 @@ func (todoService *TodoServiceImpl) Update(ctx context.Context, request web.Todo
 
 	tx, err := todoService.DB.Begin()
 	helper.PanicIfErr(err)
+	defer helper.CommitOrRollBack(tx)
 
 	todo, err := todoService.TodoRepo.FindById(ctx, tx, request.Id)
 	helper.PanicIfErr(err)
@@ -60,8 +60,6 @@ func (todoService *TodoServiceImpl) Update(ctx context.Context, request web.Todo
 	fmt.Println(todo.Name)
 
 	result := todoService.TodoRepo.Update(ctx, tx, todo)
-
-	defer helper.CommitOrRollBack(tx)
 	return helper.ToTodoResponse(result)
 }
 
@@ -96,7 +94,6 @@ func (todoService *TodoServiceImpl) FindAll(ctx context.Context) []web.TodoRespo
 	helper.PanicIfErr(err)
 
 	listTodo := []web.TodoResponse{}
-
 	for _, todo := range todos {
 		listTodo = append(listTodo, helper.ToTodoResponse(todo))
 	}

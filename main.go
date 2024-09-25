@@ -5,6 +5,7 @@ import (
 	"http-basic/controller"
 	"http-basic/database"
 	"http-basic/helper"
+	"http-basic/middleware"
 	"http-basic/repository"
 	"http-basic/service"
 	"net/http"
@@ -20,38 +21,44 @@ func main() {
 	validate := validator.New()
 
 	todoRepository := repository.NewTodoRepository()
-	service := service.NewCategoryService(todoRepository, db, validate)
-	controller := controller.NewTodoController(service)
+	authRepository := repository.NewAuthRepository()
 
-	router := httprouter.New()
+	todoService := service.NewTodoService(todoRepository, db, validate)
+	authService := service.NewAuthService(authRepository, db, validate)
 
-	router.GET("/api/v1/todos", controller.FindAll)
-	router.POST("/api/v1/todos", controller.Create)
-	router.GET(path("/todos/:todoId"), controller.FindById)
-	router.PUT(path("/todos/:todoId"), controller.Update)
-	router.DELETE(path("/todos/:todoId"), controller.Delete)
-	router.PATCH(path("/todos/:todoId/finish"), controller.SetFinish)
+	todoController := controller.NewTodoController(todoService)
+	authController := controller.NewAuthController(authService)
 
-	handler := enableCORS(router)
+	// Unprotected router (for public routes like login)
+	publicRouter := httprouter.New()
+	publicRouter.POST("/api/v1/login", authController.SignIn)
+
+	// Protected router (for routes that need authentication)
+	protectedRouter := httprouter.New()
+	protectedRouter.GET("/api/v1/todos", todoController.FindAll)
+	protectedRouter.POST("/api/v1/todos", todoController.Create)
+	protectedRouter.GET("/api/v1/todos/:todoId", todoController.FindById)
+	protectedRouter.PUT("/api/v1/todos/:todoId", todoController.Update)
+	protectedRouter.DELETE("/api/v1/todos/:todoId", todoController.Delete)
+	protectedRouter.PATCH("/api/v1/todos/:todoId/finish", todoController.SetFinish)
+
+	// Apply CORS to both public and protected routers
+	publicHandler := middleware.EnableCORS(publicRouter)
+	protectedHandler := middleware.EnableCORS(middleware.NewAuthMiddleware(protectedRouter)) // Apply authentication middleware here
+
+	// Create a new multiplexer for combining both routers
+	finalHandler := http.NewServeMux()
+
+	// Register unprotected and protected routes
+	finalHandler.Handle("/api/v1/login", publicHandler) // Public route (login)
+	finalHandler.Handle("/api/v1/", protectedHandler)   // Protected routes (todos)
+
 	server := http.Server{
 		Addr:    "localhost:8080",
-		Handler: handler,
+		Handler: finalHandler,
 	}
-	fmt.Println("Web Server ready to server...")
+
+	fmt.Println("Web Server ready to serve...")
 	err := server.ListenAndServe()
 	helper.PanicIfErr(err)
-}
-
-func path(addPath string) string {
-	return "/api/v1" + addPath
-}
-
-func enableCORS(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Access-Control-Allow-Origin", "*")
-		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS, PATCH")
-		w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
-
-		next.ServeHTTP(w, r)
-	})
 }
