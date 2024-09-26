@@ -21,4 +21,6 @@ This project is a web server running locally with a PostgreSQL database. Make su
 1.  Run the webserver:
     ```bash
     go run main.go  
-    
+
+### Swagger API Screenshot
+<img src="swagger/swagger.png" width=240> 
