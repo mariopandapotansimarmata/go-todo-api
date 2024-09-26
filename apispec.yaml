@@ -5,12 +5,66 @@ info:
   description: "API Spec for Simple Todo List "
 servers:
   - url: http://localhost:8080/api/v1
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT  # Optional, but recommended to specify JWT
+
+  schemas:
+    todos:
+      type: "object"
+      properties:
+        id:
+          type: number
+        name:
+          type: string
+        timeCreate:
+          type: string
+          format: date-time
+        timeFinish:
+          type: string
+          format: date-time
+          nullable: true
+
 paths:
+  /login:
+    post:
+      tags:
+        - Authentication API
+      description: Login to get JWT
+      summary: Login to get JWT
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                password:
+                  type: string
+      responses:
+        200:
+          description: Login Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+                  expires:
+                    type: string
+                            
+
   /todos:
     get:
       security:
-        - TodoAuth:
-          - X-API-Key   
+        - BearerAuth: []  # Requires JWT Bearer authentication
       tags:
         - Todo List API
       description: List of Todos
@@ -30,12 +84,11 @@ paths:
                   data:
                     type: array
                     items:
-                      $ref: "#/components/schemas/todos"                
+                      $ref: "#/components/schemas/todos"
     
     post:
       security:
-        - TodoAuth:
-          - X-API-Key  
+        - BearerAuth: []  # Requires JWT Bearer authentication
       tags:
         - Todo List API
       description: Create Todo
@@ -62,14 +115,12 @@ paths:
                   status:
                     type: string
                   data:
-                   $ref: "#/components/schemas/todos"
+                    $ref: "#/components/schemas/todos"
   
-
   /todos/{todoId}:
     get:
       security:
-        - TodoAuth:
-          - X-API-Key
+        - BearerAuth: []  # Requires JWT Bearer authentication
       tags:
         - Todo List API
       description: Get Todo by ID
@@ -83,24 +134,23 @@ paths:
           description: Todo ID
       responses:
         200:
-          description: Seccess get Todo
+          description: Success get Todo
           content:
-              application/json:
-                schema:
-                  type: object
-                  properties:
-                    code:
-                      type: number
-                    status:
-                      type: string
-                    data: 
-                      $ref: "#/components/schemas/todos"
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: number
+                  status:
+                    type: string
+                  data: 
+                    $ref: "#/components/schemas/todos"
 
-    put:  
+    put:
       security:
-        - TodoAuth:
-          - X-API-Key
-      description : Update Todo
+        - BearerAuth: []  # Requires JWT Bearer authentication
+      description: Update Todo
       summary: Update Todo
       tags:
         - Todo List API
@@ -134,11 +184,11 @@ paths:
                   data:
                     type: array
                     items:
-                      $ref: "#/components/schemas/todos"              
+                      $ref: "#/components/schemas/todos"
+    
     delete:
       security:
-        - TodoAuth:
-          - X-API-Key
+        - BearerAuth: []  # Requires JWT Bearer authentication
       tags:
         - Todo List API
       description: Delete Todo
@@ -152,22 +202,21 @@ paths:
           description: Todo ID
       responses:
         200:
-          description: Seccess delete Todo
+          description: Success delete Todo
           content:
-              application/json:
-                schema:
-                  type: object
-                  properties:
-                    code:
-                      type: number
-                    status:
-                      type: string
-    
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: number
+                  status:
+                    type: string
+
   /todos/{todoId}/finish:
     patch:
       security:
-        - TodoAuth:
-          - X-API-Key
+        - BearerAuth: []  # Requires JWT Bearer authentication
       tags:
         - Todo List API
       description: Set Finish Todo 
@@ -201,29 +250,4 @@ paths:
                   status:
                     type: string
                   data:
-                   $ref: "#/components/schemas/todos"
-
-        
-
-components:
-  securitySchemes:
-    TodoAuth:
-      type: apiKey
-      in: header
-      name: X-API-Key
-      description: Authentication for Todo API
-  schemas:
-    todos:
-      type: "object"
-      properties:
-        id:
-          type: number
-        name:
-          type: string
-        timeCreate:
-          type: string
-          format: date-time
-        timeFinsih:
-          type: string
-          format: date-time
-          nullable: true
+                    $ref: "#/components/schemas/todos"

@@ -29,11 +29,9 @@ func main() {
 	todoController := controller.NewTodoController(todoService)
 	authController := controller.NewAuthController(authService)
 
-	// Unprotected router (for public routes like login)
 	publicRouter := httprouter.New()
 	publicRouter.POST("/api/v1/login", authController.SignIn)
 
-	// Protected router (for routes that need authentication)
 	protectedRouter := httprouter.New()
 	protectedRouter.GET("/api/v1/todos", todoController.FindAll)
 	protectedRouter.POST("/api/v1/todos", todoController.Create)
@@ -42,16 +40,13 @@ func main() {
 	protectedRouter.DELETE("/api/v1/todos/:todoId", todoController.Delete)
 	protectedRouter.PATCH("/api/v1/todos/:todoId/finish", todoController.SetFinish)
 
-	// Apply CORS to both public and protected routers
 	publicHandler := middleware.EnableCORS(publicRouter)
 	protectedHandler := middleware.EnableCORS(middleware.NewAuthMiddleware(protectedRouter)) // Apply authentication middleware here
 
-	// Create a new multiplexer for combining both routers
 	finalHandler := http.NewServeMux()
 
-	// Register unprotected and protected routes
-	finalHandler.Handle("/api/v1/login", publicHandler) // Public route (login)
-	finalHandler.Handle("/api/v1/", protectedHandler)   // Protected routes (todos)
+	finalHandler.Handle("/api/v1/login", publicHandler)
+	finalHandler.Handle("/api/v1/", protectedHandler)
 
 	server := http.Server{
 		Addr:    "localhost:8080",
